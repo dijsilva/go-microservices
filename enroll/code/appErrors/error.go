@@ -48,6 +48,16 @@ func NotFound(message string) ErrorResponse {
 	}
 }
 
+func AccessDenied(message string) ErrorResponse {
+	if message == "" {
+		message = "Access denied."
+	}
+	return ErrorResponse{
+		Status:  http.StatusUnauthorized,
+		Message: message,
+	}
+}
+
 func BadInput(message string) ErrorResponse {
 	if message == "" {
 		message = "Bad input."

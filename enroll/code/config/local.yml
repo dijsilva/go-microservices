@@ -1,10 +1,10 @@
 dsn: "postgres://user:pass@postgres-db:5432/database?&sslmode=disable"
 dbUser: user
-dbHost: localhost
+dbHost: postgres-db
 dbPassword: pass
 dbName: database
 dbPort: 5432
 dbSSLMode: disable
 tokenSignature: teste@123
 tokenExpirationInHours: 5
-appPort: ":3003"
+appPort: ":80"

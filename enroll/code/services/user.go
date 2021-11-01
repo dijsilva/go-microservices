@@ -5,10 +5,6 @@ import (
 	"enroll/database"
 	"enroll/database/entities"
 	"enroll/helpers"
-	"enroll/utils"
-	"time"
-
-	"github.com/dgrijalva/jwt-go"
 
 	"github.com/google/uuid"
 )
@@ -113,7 +109,7 @@ func (us *UserService) LoginUser(input *LoginUserInput) (LoginUserReturn, appErr
 		}).First(&user).Error == nil {
 			if helpers.CheckPassWord(input.Password, user.Password) {
 				var token string
-				token, err = generateJwtToken(user)
+				token, err = helpers.GenerateJwtToken(user)
 				userReturn = LoginUserReturn{
 					Id:       user.Id,
 					Email:    user.Email,
@@ -135,7 +131,7 @@ func (us *UserService) LoginUser(input *LoginUserInput) (LoginUserReturn, appErr
 		}).Find(&user).Error != nil {
 			if helpers.CheckPassWord(input.Password, user.Password) {
 				var token string
-				token, err = generateJwtToken(user)
+				token, err = helpers.GenerateJwtToken(user)
 				userReturn = LoginUserReturn{
 					Id:       user.Id,
 					Email:    user.Email,
@@ -155,25 +151,4 @@ func (us *UserService) LoginUser(input *LoginUserInput) (LoginUserReturn, appErr
 	}
 
 	return userReturn, err
-}
-func generateJwtToken(user entities.User) (string, appErrors.ErrorResponse) {
-	var jsonWebToken string
-	var appError appErrors.ErrorResponse
-	var err error
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":      user.Id,
-		"name":    user.Name,
-		"email":   user.Email,
-		"profile": user.Profile.ProfileName,
-		"exp": time.Now().Add(time.Duration(
-			utils.ConfigurationEnvs.TokenExpirationInHours,
-		) * time.Hour).Unix(),
-	})
-
-	jsonWebToken, err = token.SignedString([]byte(utils.ConfigurationEnvs.TokenSignature))
-	if err != nil {
-		appError = appErrors.InternalServerError(err.Error())
-		return jsonWebToken, appError
-	}
-	return jsonWebToken, appError
 }

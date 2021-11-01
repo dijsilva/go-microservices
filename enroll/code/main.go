@@ -44,6 +44,12 @@ func main() {
 			userRoutes := routes.User{}
 			userRoutes.Handler(userGroup)
 		}
+		authGroup := v1.Group("/auth")
+		{
+			authRoutes := routes.Auth{}
+			authRoutes.Handler(authGroup)
+
+		}
 	}
 
 	mainModule.appRouting.Run(utils.ConfigurationEnvs.AppPort)
