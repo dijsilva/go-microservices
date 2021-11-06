@@ -1,5 +1,8 @@
 # enroll
 
-- Cadastro de usuários
-- Autenticação de usuários
-- Validação de acesso (por JWT)
+
+## Funcionalidades
+- [ ] Cadastro
+  - [ ] Criar novo usuário recebendo: nome, email, senha e username
+- [ ] Autenticação
+  - [ ] Autenticação de usuários por meio do email/username e senha
