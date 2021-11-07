@@ -6,6 +6,11 @@
 package interfaces
 
 // Message defines the response message
+type ErrorResponse struct {
+	Data ErrorMessage `json:"data"`
+}
+
 type ErrorMessage struct {
 	Message string `json:"message"`
+	Status  int    `json:"status"`
 }

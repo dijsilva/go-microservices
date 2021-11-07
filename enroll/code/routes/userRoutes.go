@@ -16,4 +16,5 @@ func (u *User) Handler(routerGroup *gin.RouterGroup) {
 
 	routerGroup.Use(middleware.AdminAuth())
 	routerGroup.GET("/users", uC.ListUsers)
+	routerGroup.POST("/change-profile", uC.ChangeProfile)
 }

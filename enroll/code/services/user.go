@@ -7,6 +7,7 @@ import (
 	"enroll/helpers"
 	"enroll/providers"
 	"fmt"
+	"log"
 
 	"github.com/google/uuid"
 )
@@ -24,6 +25,11 @@ type LoginUserInput struct {
 	Email    string `json:"email"`
 	Username string `json:"username"`
 	Password string `json:"password"`
+}
+
+type ChangeProfileInput struct {
+	UserId  string `json:"user_id" binding:"required"`
+	Profile int    `json:"new_profile_id" binding:"required"`
 }
 
 type LoginUserReturn struct {
@@ -69,6 +75,16 @@ func findByUserNameOrEmail(username string, email string) appErrors.ErrorRespons
 		return appErrors.AlreadyExists("User already exists")
 	}
 	return err
+}
+
+func findById(id string) (entities.User, appErrors.ErrorResponse) {
+	databaseConnection := database.Database.Connection
+	var user entities.User
+	databaseConnection.Where("id = ?", id).First(&user)
+	if user == (entities.User{}) {
+		return user, appErrors.NotFound("User not found")
+	}
+	return user, appErrors.ErrorResponse{}
 }
 
 func (us *UserService) CreateUser(input *CreateUserInput) appErrors.ErrorResponse {
@@ -181,4 +197,26 @@ func (us *UserService) ListUsers() []User {
 		Select("users.id,users.name,users.email,users.username,users.profile_id, profiles.profile_name, profiles.id as profile_id").
 		Joins("left join profiles on profiles.id = users.profile_id").Find(&users)
 	return users
+}
+
+func (us *UserService) ChangeProfile(input ChangeProfileInput) appErrors.ErrorResponse {
+	databaseConnection := database.Database.Connection
+	user, err := findById(input.UserId)
+
+	if err.Message != "" {
+		log.Println(fmt.Sprintf("Error to get user by id - %s", err.Message))
+		return err
+	}
+
+	if user.ProfileID == input.Profile {
+		return appErrors.ErrorResponse{}
+	}
+
+	var userToUpdate entities.User
+	if err := databaseConnection.Model(userToUpdate).
+		Where("id = ?", input.UserId).
+		Update("profile_id", input.Profile).Error; err != nil {
+		return appErrors.InternalServerError("User not updated")
+	}
+	return appErrors.ErrorResponse{}
 }
