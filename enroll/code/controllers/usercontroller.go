@@ -47,3 +47,9 @@ func (u *UserController) Login(ctx *gin.Context) {
 		}
 	}
 }
+
+func (u *UserController) ListUsers(ctx *gin.Context) {
+	userService := services.UserService{}
+	users := userService.ListUsers()
+	ctx.JSON(http.StatusOK, users)
+}

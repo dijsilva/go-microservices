@@ -2,6 +2,7 @@ package routes
 
 import (
 	"enroll/controllers"
+	"enroll/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,4 +13,7 @@ func (u *User) Handler(routerGroup *gin.RouterGroup) {
 	uC := controllers.UserController{}
 	routerGroup.POST("/new", uC.Create)
 	routerGroup.POST("/auth", uC.Login)
+
+	routerGroup.Use(middleware.AdminAuth())
+	routerGroup.GET("/users", uC.ListUsers)
 }

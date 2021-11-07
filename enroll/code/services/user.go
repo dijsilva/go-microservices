@@ -6,6 +6,7 @@ import (
 	"enroll/database/entities"
 	"enroll/helpers"
 	"enroll/providers"
+	"fmt"
 
 	"github.com/google/uuid"
 )
@@ -93,7 +94,7 @@ func (us *UserService) CreateUser(input *CreateUserInput) appErrors.ErrorRespons
 		Username:  input.Username,
 		Email:     input.Email,
 		Password:  hashPass,
-		ProfileID: 1,
+		ProfileID: 2,
 	}
 	databaseConnection.Create(&user)
 	return err
@@ -115,7 +116,7 @@ func (us *UserService) LoginUser(input *LoginUserInput) (LoginUserReturn, appErr
 					Profile:   user.Profile.ProfileName,
 					UserMail:  user.Email,
 					UserName:  user.Username,
-					TokenKind: "LOGIN",
+					TokenKind: fmt.Sprintf("LOGIN_%s", user.Profile.ProfileName),
 				})
 				if errorAuthControl.Message != "" {
 					err = errorAuthControl
@@ -161,4 +162,23 @@ func (us *UserService) LoginUser(input *LoginUserInput) (LoginUserReturn, appErr
 	}
 
 	return userReturn, err
+}
+
+type User struct {
+	Id          uuid.UUID `json:"id"`
+	Name        string    `json:"name"`
+	Email       string    `json:"email"`
+	Username    string    `json:"username"`
+	ProfileName string    `json:"profile_name"`
+	ProfileId   uint      `json:"profile_id"`
+}
+
+func (us *UserService) ListUsers() []User {
+	databaseConnection := database.Database.Connection
+	var users []User
+
+	databaseConnection.
+		Select("users.id,users.name,users.email,users.username,users.profile_id, profiles.profile_name, profiles.id as profile_id").
+		Joins("left join profiles on profiles.id = users.profile_id").Find(&users)
+	return users
 }

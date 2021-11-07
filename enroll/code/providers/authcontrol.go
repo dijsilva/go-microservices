@@ -21,6 +21,11 @@ type CreateTokenInput struct {
 	TokenKind string `json:"tokenKind"`
 }
 
+type ValidTokenInput struct {
+	Token     string `json:"token"`
+	TokenKind string `json:"tokenKind"`
+}
+
 type CreateTokenResponse struct {
 	Token     string `json:"token"`
 	ExpiresAt int64  `json:"expires_at"`
@@ -42,7 +47,7 @@ func (auth *AuthControl) GetToken(input CreateTokenInput) (AuthControlResponse, 
 	resp, err := http.Post(createTokenEndpoint, "application/json", bytes.NewBuffer(jsonInput))
 
 	if err != nil {
-		log.Println(fmt.Sprintf("Error to call auth control microservice", err.Error()))
+		log.Println(fmt.Sprintf("Error to call auth control microservice - %s", err.Error()))
 		return AuthControlResponse{}, appErrors.InternalServerError("Error to call auth control microservice")
 	}
 
@@ -61,4 +66,30 @@ func (auth *AuthControl) GetToken(input CreateTokenInput) (AuthControlResponse, 
 	}
 	fmt.Println(result)
 	return result, appErrors.ErrorResponse{}
+}
+
+func (auth *AuthControl) ValidToken(input ValidTokenInput) (bool, appErrors.ErrorResponse) {
+	validTokenEnddpoint := fmt.Sprintf("%s/valid-token", utils.ConfigurationEnvs.AuthControlHost)
+
+	jsonInput, err := json.Marshal(input)
+
+	if err != nil {
+		log.Println("Failed to create input to call auth controll microservice")
+		return false, appErrors.InternalServerError("Failed to create input to call auth controll microservice")
+	}
+	resp, err := http.Post(validTokenEnddpoint, "application/json", bytes.NewBuffer(jsonInput))
+
+	fmt.Println(resp.StatusCode)
+	fmt.Println(resp.Status)
+
+	if err != nil {
+		log.Println(fmt.Sprintf("Error to call auth control microservice - %s", err.Error()))
+		return false, appErrors.InternalServerError("Error to call auth control microservice")
+	}
+
+	if resp.StatusCode != 200 {
+		return false, appErrors.ErrorResponse{}
+	}
+
+	return true, appErrors.ErrorResponse{}
 }
