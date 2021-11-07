@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"enroll/appErrors"
+	"enroll/interfaces"
 	"enroll/providers"
 	"net/http"
 	"strings"
@@ -13,13 +13,25 @@ func AdminAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if len(authHeader) == 0 {
-			c.AbortWithError(http.StatusUnauthorized, appErrors.Unauthorized("Token not provided"))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, interfaces.ErrorResponse{
+				Data: interfaces.ErrorMessage{
+					Message: "Token not provided",
+					Status:  401,
+				},
+			})
+			return
 		}
 
 		bearerAndToken := strings.Fields(authHeader)
 
 		if len(bearerAndToken) != 2 {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, appErrors.Unauthorized("Token bad formated"))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, interfaces.ErrorResponse{
+				Data: interfaces.ErrorMessage{
+					Message: "Token bad formated",
+					Status:  401,
+				},
+			})
+			return
 		}
 
 		authControl := providers.AuthControl{}
@@ -29,12 +41,23 @@ func AdminAuth() gin.HandlerFunc {
 		})
 
 		if err.Message != "" {
-			c.AbortWithStatusJSON(err.StatusCode(), err.Message)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, interfaces.ErrorResponse{
+				Data: interfaces.ErrorMessage{
+					Message: err.Message,
+					Status:  http.StatusUnauthorized,
+				},
+			})
+			return
 
 		}
 		if !respValidToken {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, "Access not allowed to this endpoint")
-
+			c.AbortWithStatusJSON(http.StatusUnauthorized, interfaces.ErrorResponse{
+				Data: interfaces.ErrorMessage{
+					Message: "Access not allowed to this endpoint",
+					Status:  http.StatusUnauthorized,
+				},
+			})
+			return
 		}
 
 		c.Next()

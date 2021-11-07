@@ -6,6 +6,10 @@
 package interfaces
 
 // Message defines the response message
-type StringMessage struct {
+type Response struct {
+	Data Message `json:"data"`
+}
+
+type Message struct {
 	Message string `json:"message"`
 }

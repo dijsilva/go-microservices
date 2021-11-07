@@ -64,7 +64,6 @@ func (auth *AuthControl) GetToken(input CreateTokenInput) (AuthControlResponse, 
 		log.Println("Error to parse auth control microservice response")
 		return AuthControlResponse{}, appErrors.InternalServerError("Error to parse auth control microservice response")
 	}
-	fmt.Println(result)
 	return result, appErrors.ErrorResponse{}
 }
 
@@ -78,9 +77,6 @@ func (auth *AuthControl) ValidToken(input ValidTokenInput) (bool, appErrors.Erro
 		return false, appErrors.InternalServerError("Failed to create input to call auth controll microservice")
 	}
 	resp, err := http.Post(validTokenEnddpoint, "application/json", bytes.NewBuffer(jsonInput))
-
-	fmt.Println(resp.StatusCode)
-	fmt.Println(resp.Status)
 
 	if err != nil {
 		log.Println(fmt.Sprintf("Error to call auth control microservice - %s", err.Error()))
