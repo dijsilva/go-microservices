@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  redis_auth_control:
+    image: redis:6.2.6
+    container_name: "redis_auth_control"
+    command: redis-server --requirepass pass
+    ports:
+        - "6379:6379"
+  auth_control:
+    build: ./auth-control/.
+    container_name: "auth_control_api"
+    ports:
+        - "3002:80"
+    depends_on:
+        - redis_auth_control
+
+  postgres-db:
+    image: postgres
+    container_name: "postgres-db"
+    environment:
+        - POSTGRES_PASSWORD=pass
+        - POSTGRES_USER=user
+        - POSTGRES_DB=database
+    restart: on-failure
+    ports:
+        - "5432:5432"
+
+  enroll:
+      build: ./enroll/.
+      container_name: "enroll"
+      ports:
+          - "3003:80"
+      depends_on:
+          - postgres-db
