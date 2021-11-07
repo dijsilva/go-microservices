@@ -2,6 +2,7 @@ package main
 
 import (
 	"auth-control/configurations"
+	"auth-control/database"
 	"auth-control/routes"
 
 	"github.com/gin-gonic/gin"
@@ -19,6 +20,11 @@ func (main *Main) initConfig() error {
 	var err error
 
 	if err = configurations.LoadEnvs("local"); err != nil {
+		return err
+	}
+
+	database.Database, err = database.CreateDatabase()
+	if err != nil {
 		return err
 	}
 	return nil

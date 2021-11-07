@@ -1,0 +1,6 @@
+appPort: ":80"
+redisHost: "redis_auth_control"
+redisPort: "6379"
+redisPassword: "pass"
+redisDatabase: 0
+tokenExpirationInHours: 5

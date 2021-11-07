@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  redis_auth_control:
+    image: redis:6.2.6
+    container_name: "redis_auth_control"
+    command: redis-server --requirepass pass
+    ports:
+        - "6379:6379"
+  auth_control:
+    build: .
+    container_name: "auth_control_api"
+    ports:
+        - "3003:80"
+    depends_on:
+        - redis_auth_control

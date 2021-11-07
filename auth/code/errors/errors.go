@@ -26,6 +26,20 @@ func DefaultBadRequest(message string) ErrorResponse {
 	}
 }
 
+func InternalServerError(message string) ErrorResponse {
+	return ErrorResponse{
+		Status:  http.StatusInternalServerError,
+		Message: "Internal server error",
+	}
+}
+
+func DatabaseOperationError(message string) ErrorResponse {
+	return ErrorResponse{
+		Status:  http.StatusInternalServerError,
+		Message: "Internal server error - Database operation",
+	}
+}
+
 func Unauthorized(message string) ErrorResponse {
 	return ErrorResponse{
 		Status:  http.StatusUnauthorized,

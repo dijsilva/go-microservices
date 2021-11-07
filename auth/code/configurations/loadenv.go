@@ -8,7 +8,13 @@ import (
 )
 
 type EnvsModel struct {
-	AppPort string `yaml:"appPort"`
+	AppPort                string `yaml:"appPort"`
+	RedisHost              string `yaml:"redisHost"`
+	RedisPort              string `yaml:"redisPort"`
+	RedisPassword          string `yaml:"redisPassword"`
+	RedisDatabase          int    `yaml:"redisDatabase"`
+	TokenExpirationInHours int    `yaml:"tokenExpirationInHours"`
+	TokenSignature         string `yaml:"tokenSignature"`
 }
 
 var (
@@ -16,7 +22,7 @@ var (
 )
 
 func LoadEnvs(envName string) error {
-	fileName := fmt.Sprintf("./config/%s.yaml", envName)
+	fileName := fmt.Sprintf("./config/%s.yml", envName)
 
 	fileBytes, err := ioutil.ReadFile(fileName)
 	if err != nil {
