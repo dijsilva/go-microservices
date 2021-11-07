@@ -5,6 +5,7 @@ import (
 	"enroll/database"
 	"enroll/database/entities"
 	"enroll/helpers"
+	"enroll/providers"
 
 	"github.com/google/uuid"
 )
@@ -108,15 +109,24 @@ func (us *UserService) LoginUser(input *LoginUserInput) (LoginUserReturn, appErr
 			Email: input.Email,
 		}).First(&user).Error == nil {
 			if helpers.CheckPassWord(input.Password, user.Password) {
-				var token string
-				token, err = helpers.GenerateJwtToken(user)
+				authControl := providers.AuthControl{}
+				tokenResp, errorAuthControl := authControl.GetToken(providers.CreateTokenInput{
+					UserId:    user.Id.String(),
+					Profile:   user.Profile.ProfileName,
+					UserMail:  user.Email,
+					UserName:  user.Username,
+					TokenKind: "LOGIN",
+				})
+				if errorAuthControl.Message != "" {
+					err = errorAuthControl
+				}
 				userReturn = LoginUserReturn{
 					Id:       user.Id,
 					Email:    user.Email,
 					Username: user.Username,
 					Name:     user.Name,
 					Profile:  user.Profile.ProfileName,
-					Token:    token,
+					Token:    tokenResp.Data.Token,
 				}
 			} else {
 				err = appErrors.IncorrectCredentials("")
@@ -130,15 +140,15 @@ func (us *UserService) LoginUser(input *LoginUserInput) (LoginUserReturn, appErr
 			Username: input.Username,
 		}).Find(&user).Error != nil {
 			if helpers.CheckPassWord(input.Password, user.Password) {
-				var token string
-				token, err = helpers.GenerateJwtToken(user)
+				// var token string
+				// token, err = helpers.GenerateJwtToken(user)
 				userReturn = LoginUserReturn{
 					Id:       user.Id,
 					Email:    user.Email,
 					Username: user.Username,
 					Name:     user.Name,
 					Profile:  user.Profile.ProfileName,
-					Token:    token,
+					Token:    "token",
 				}
 			} else {
 				err = appErrors.IncorrectCredentials("Incorrect credentials")

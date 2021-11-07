@@ -18,6 +18,7 @@ type Configuration struct {
 	DatabaseSSLMode        string `yaml:"dbSSLMode"`
 	TokenExpirationInHours int    `yaml:"tokenExpirationInHours"`
 	TokenSignature         string `yaml:"tokenSignature"`
+	AuthControlHost        string `yaml:"authControlHost"`
 }
 
 var (
@@ -26,8 +27,7 @@ var (
 
 func LoadConfig(envName string) error {
 
-	var configFileName string
-	configFileName = fmt.Sprintf("config/%s.yml", envName)
+	configFileName := fmt.Sprintf("config/%s.yml", envName)
 	var flagConfig = flag.String("config", configFileName, "path to the config file")
 
 	bytes, err := ioutil.ReadFile(*flagConfig)

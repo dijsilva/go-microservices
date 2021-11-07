@@ -5,6 +5,10 @@ dbPassword: pass
 dbName: database
 dbPort: 5432
 dbSSLMode: disable
+
 tokenSignature: teste@123
 tokenExpirationInHours: 5
+
 appPort: ":80"
+
+authControlHost: "http://authcontrol/api/v1"

@@ -11,6 +11,6 @@ services:
     build: .
     container_name: "auth_control_api"
     ports:
-        - "3003:80"
+        - "3002:80"
     depends_on:
         - redis_auth_control
