@@ -7,7 +7,7 @@ import (
 type IDatabase interface {
 	Create(input SpectraDTO) (string, appErrors.ErrorResponse)
 	DisconnectDatabse()
-	ListByOwner(usernameOwner string) ([]SpectrasResponse, appErrors.ErrorResponse)
+	ListByOwner(emailOwner string) ([]SpectrasResponse, appErrors.ErrorResponse)
 	GetById(id string) (SpectraDTO, appErrors.ErrorResponse)
 }
 

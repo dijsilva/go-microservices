@@ -52,33 +52,33 @@ func (s *Services) CreateToken(ctx context.Context, input *CreateTokenInput) (Cr
 	return CreateTokenServiceResponse{Token: token.token, ExpiresAt: token.tokenExpiration}, appErrors.ErrorResponse{}
 }
 
-func (s *Services) ValidToken(ctx context.Context, input *ValidTokenInput) (string, appErrors.ErrorResponse) {
+func (s *Services) ValidToken(ctx context.Context, input *ValidTokenInput) (ValidTokenResponse, appErrors.ErrorResponse) {
 	log.Println("Decoding token")
 	tokenValidResponse, err := DecodeJwtToken(input.Token)
 	if err.Message != "" {
 		log.Println(fmt.Sprintf("Error to decode token - %s", err.Message))
-		return "", err
+		return ValidTokenResponse{}, err
 	}
 
 	log.Println(fmt.Sprintf("Getting token for id - %s", tokenValidResponse.Id))
 	tokenStored, err := database.Database.Get(ctx, tokenValidResponse.Id)
 	if err.Message != "" {
 		log.Println(fmt.Sprintf("Error to get token from database - %s", err.Message))
-		return "", appErrors.Unauthorized("invalid token")
+		return ValidTokenResponse{}, appErrors.Unauthorized("invalid token")
 	}
 
 	log.Println("Decoding token stored in database")
 	tokenStoredParsed, err := DecodeJwtToken(tokenStored)
 	if err.Message != "" {
 		log.Println(fmt.Sprintf("Error to decode token stored in database - %s", err.Message))
-		return "", err
+		return ValidTokenResponse{}, err
 	}
 	if tokenStoredParsed.TokenKind != input.TokenKind || tokenStored != input.Token {
 		err = appErrors.Unauthorized("invalid token kind")
-		return "", err
+		return ValidTokenResponse{}, err
 	}
 
-	return "", appErrors.ErrorResponse{}
+	return tokenStoredParsed, appErrors.ErrorResponse{}
 }
 
 func (s *Services) DeleteToken(ctx context.Context, input *DeleteTokenInput) appErrors.ErrorResponse {

@@ -27,6 +27,17 @@ func (s *SpectraController) CreateSpectra(ctx *gin.Context) {
 		return
 	}
 
+	userOwnerEmail := ctx.GetString("user_owner_email")
+
+	if userOwnerEmail == "" {
+		ctx.JSON(http.StatusBadRequest, interfaces.ErrorResponse{
+			Data:   "Undefined email of owner spectra",
+			Status: http.StatusInternalServerError,
+		})
+		return
+	}
+
+	input.EmailOwner = userOwnerEmail
 	hexId, errorCreate := spectraServices.CreateSpectraService(input, spectraFile)
 
 	if errorCreate.Message != "" {
@@ -44,13 +55,29 @@ func (s *SpectraController) CreateSpectra(ctx *gin.Context) {
 
 func (s *SpectraController) ListByOwner(ctx *gin.Context) {
 	spectraServices := services.SpectraServices{}
-	records, errorCreate := spectraServices.ListByOwner("dijsilva")
+
+	userOwnerEmail := ctx.GetString("user_owner_email")
+
+	if userOwnerEmail == "" {
+		ctx.JSON(http.StatusBadRequest, interfaces.ErrorResponse{
+			Data:   "Undefined email of owner spectra",
+			Status: http.StatusInternalServerError,
+		})
+		return
+	}
+
+	records, errorCreate := spectraServices.ListByOwner(userOwnerEmail)
 
 	if errorCreate.Message != "" {
 		ctx.JSON(errorCreate.StatusCode(), interfaces.ErrorResponse{
 			Data:   errorCreate.Error(),
 			Status: errorCreate.StatusCode(),
 		})
+		return
+	}
+
+	if len(records) == 0 {
+		ctx.Status(http.StatusNotFound)
 		return
 	}
 	ctx.JSON(http.StatusOK, records)

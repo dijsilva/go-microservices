@@ -48,3 +48,13 @@ func NotFound(message string) ErrorResponse {
 		Message: message,
 	}
 }
+
+func Unauthorized(message string) ErrorResponse {
+	if message == "" {
+		message = "Not found"
+	}
+	return ErrorResponse{
+		Status:  http.StatusUnauthorized,
+		Message: message,
+	}
+}

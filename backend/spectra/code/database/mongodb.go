@@ -26,20 +26,26 @@ type SpectraFileRow struct {
 }
 
 type SpectraDTO struct {
-	ID            primitive.ObjectID `bson:"_id" json:"id"`
-	SampleName    string             `bson:"sample_name" binding:"required"`
-	UserOwner     string             `bson:"user_owner"`
-	NSamples      int                `bson:"n_samples" binding:"required"`
-	EquipmentUsed string             `bson:"equipment_used" binding:"required"`
-	Rows          []SpectraFileRow   `bson:"data"`
+	ID                  primitive.ObjectID `bson:"_id" json:"id"`
+	SampleName          string             `bson:"sample_name" binding:"required"`
+	EmailOwner          string             `bson:"email_owner"`
+	NSpectra            int                `bson:"n_spectra" binding:"required"`
+	EquipmentUsed       string             `bson:"equipment_used" binding:"required"`
+	PredictionConcluded bool               `bson:"prediction_concluded" default:"false"`
+	Rows                []SpectraFileRow   `bson:"data"`
+	CreatedAt           primitive.DateTime `bson:"createdAt"`
+	UpdatedAt           primitive.DateTime `bson:"updatedAt"`
 }
 
 type SpectrasResponse struct {
-	ID            primitive.ObjectID `bson:"_id" json:"id"`
-	SampleName    string             `bson:"sample_name" binding:"required"`
-	UserOwner     string             `bson:"user_owner"`
-	NSamples      int                `bson:"n_samples" binding:"required"`
-	EquipmentUsed string             `bson:"equipment_used" binding:"required"`
+	ID                  primitive.ObjectID `bson:"_id" json:"id"`
+	SampleName          string             `bson:"sample_name" json:"sample_name"`
+	EmailOwner          string             `bson:"email_owner" json:"email_owner"`
+	NSpectra            int                `bson:"n_spectra" json:"n_spectra"`
+	EquipmentUsed       string             `bson:"equipment_used" json:"equipament_used"`
+	PredictionConcluded bool               `bson:"prediction_concluded" json:"prediction_concluded"`
+	CreatedAt           primitive.DateTime `bson:"createdAt" json:"created_at"`
+	UpdatedAt           primitive.DateTime `bson:"updatedAt" json:"updated_at"`
 }
 
 type MongoDb struct {
@@ -84,6 +90,8 @@ func (m *MongoDb) Create(input SpectraDTO) (string, appErrors.ErrorResponse) {
 	log.Println("Getting spectra_request collection")
 	collection := m.Client.Database(commom.Envs.MongoDbDatabaseName).Collection("spectra_request")
 	input.ID = primitive.NewObjectID()
+	input.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
+	input.UpdatedAt = primitive.NewDateTimeFromTime(time.Now())
 	dataInserted, err := collection.InsertOne(ctx, input)
 	if err != nil {
 		return "", appErrors.InternalServerError(fmt.Sprintf("Error to store data - %s", err.Error()))
@@ -92,12 +100,12 @@ func (m *MongoDb) Create(input SpectraDTO) (string, appErrors.ErrorResponse) {
 	return hexId, appErrors.ErrorResponse{}
 }
 
-func (m *MongoDb) ListByOwner(usernameOwner string) ([]SpectrasResponse, appErrors.ErrorResponse) {
+func (m *MongoDb) ListByOwner(emailOwner string) ([]SpectrasResponse, appErrors.ErrorResponse) {
 	var results []SpectrasResponse
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	log.Println("Getting spectra_request collection for list by owner")
-	filter := bson.D{{"user_owner", usernameOwner}}
+	filter := bson.D{{"email_owner", emailOwner}}
 	collection := m.Client.Database(commom.Envs.MongoDbDatabaseName).Collection("spectra_request")
 	cursor, err := collection.Find(ctx, filter)
 	defer func() {

@@ -16,6 +16,7 @@ type AppEnvs struct {
 	MongoDbPort         string `yaml:"mongoDbPort"`
 	MaxPoolSize         string `yaml:"maxPoolSize"`
 	MongoDbDatabaseName string `yaml:"mongoDbDatabaseName"`
+	AuthControlHost     string `yaml:"authControlHost"`
 }
 
 var Envs *AppEnvs

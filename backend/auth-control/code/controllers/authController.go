@@ -15,6 +15,10 @@ type CreateTokenResponse struct {
 	Data services.CreateTokenServiceResponse `json:"data"`
 }
 
+type ParseTokenResponse struct {
+	Data services.ValidTokenResponse `json:"data"`
+}
+
 type ValidTokenResponse struct {
 	Message string `json:"message"`
 }
@@ -48,6 +52,22 @@ func (c *Controllers) ValidToken(ctx *gin.Context) {
 		return
 	}
 	ctx.Status(http.StatusOK)
+}
+
+func (c *Controllers) ValidParseToken(ctx *gin.Context) {
+	authService := services.Services{}
+	var input services.ValidTokenInput
+	if err := ctx.ShouldBind(&input); err != nil {
+		log.Println(fmt.Sprintf("Invalid fields for valid token - %s", err.Error()))
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	tokenParsed, err := authService.ValidToken(ctx.Request.Context(), &input)
+	if err.Message != "" {
+		ctx.JSON(err.StatusCode(), ValidTokenResponse{Message: err.Message})
+		return
+	}
+	ctx.JSON(http.StatusOK, ParseTokenResponse{Data: tokenParsed})
 }
 
 func (c *Controllers) DeleteToken(ctx *gin.Context) {

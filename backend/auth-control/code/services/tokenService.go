@@ -15,11 +15,11 @@ type GenerateJWTTokenResponse struct {
 }
 
 type ValidTokenResponse struct {
-	Email     string
-	Id        string
-	Name      string
-	TokenKind string
-	Profile   string
+	Email     string `json:"email"`
+	Id        string `json:"id"`
+	Name      string `json:"name"`
+	TokenKind string `json:"token_kind"`
+	Profile   string `json:"profile"`
 }
 
 type TokenClaims struct {

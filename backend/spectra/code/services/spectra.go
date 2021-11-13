@@ -14,9 +14,9 @@ type SpectraServices struct{}
 
 type CreateSpectraInput struct {
 	SampleName    string `form:"sample_name" binding:"required"`
-	NSamples      int    `form:"n_samples" binding:"required"`
+	NSpectra      int    `form:"n_spectra" binding:"required"`
 	EquipmentUsed string `form:"equipment_used" binding:"required"`
-	UserOwner     string `form:"user_owner" binding:"required"`
+	EmailOwner    string
 }
 
 func (s *SpectraServices) CreateSpectraService(input CreateSpectraInput, file *multipart.FileHeader) (string, appErrors.ErrorResponse) {
@@ -41,7 +41,7 @@ func (s *SpectraServices) CreateSpectraService(input CreateSpectraInput, file *m
 		return "", serviceError
 	}
 
-	if len(records)-1 < input.NSamples {
+	if len(records)-1 < input.NSpectra {
 		serviceError = appErrors.BadRequest("Number of samples is wrong")
 		return "", serviceError
 	}
@@ -65,7 +65,7 @@ func (s *SpectraServices) CreateSpectraService(input CreateSpectraInput, file *m
 	}
 
 	spectraData = append(spectraData, colNames)
-	for i := 1; i < input.NSamples+1; i++ {
+	for i := 1; i < input.NSpectra+1; i++ {
 		newColumn := database.SpectraFileRow{
 			Row:      i,
 			IsHeader: false,
@@ -86,10 +86,10 @@ func (s *SpectraServices) CreateSpectraService(input CreateSpectraInput, file *m
 
 	createSpectraDTO := database.SpectraDTO{
 		SampleName:    input.SampleName,
-		NSamples:      input.NSamples,
+		NSpectra:      input.NSpectra,
 		EquipmentUsed: input.EquipmentUsed,
 		Rows:          spectraData,
-		UserOwner:     input.UserOwner,
+		EmailOwner:    input.EmailOwner,
 	}
 
 	log.Println("Call spectra repository to create new register")
