@@ -1,0 +1,7 @@
+appPort: ":3003"
+mongoDbUser: "user"
+mongoDbPass: "pass"
+mongoDbDatabaseName: "spectra"
+mongoDbHost: "localhost"
+mongoDbPort: "27017"
+maxPoolSize: "20"
