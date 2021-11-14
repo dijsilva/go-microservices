@@ -17,6 +17,8 @@ type AppEnvs struct {
 	MaxPoolSize         string `yaml:"maxPoolSize"`
 	MongoDbDatabaseName string `yaml:"mongoDbDatabaseName"`
 	AuthControlHost     string `yaml:"authControlHost"`
+	RabbitMQHost        string `yaml:"rabbitMQHost"`
+	RabbitMQQueue       string `yaml:"rabbitMQQueue"`
 }
 
 var Envs *AppEnvs
