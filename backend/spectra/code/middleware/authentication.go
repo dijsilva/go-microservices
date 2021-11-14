@@ -35,7 +35,7 @@ func Authentication() gin.HandlerFunc {
 		authControl := providers.AuthControl{}
 		authControlResponse, err := authControl.ValidToken(providers.ValidTokenInput{
 			Token:     bearerAndToken[1],
-			TokenKind: "LOGIN",
+			TokenKind: "LOGIN_USER",
 		})
 
 		if err.Message != "" {

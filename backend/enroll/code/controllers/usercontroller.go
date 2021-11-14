@@ -24,7 +24,7 @@ func (u *UserController) Create(ctx *gin.Context) {
 		if error.Message != "" {
 			ctx.JSON(error.StatusCode(), interfaces.Response{Data: interfaces.Message{Message: error.Message}})
 		} else {
-			ctx.JSON(http.StatusOK, interfaces.Response{Data: interfaces.Message{Message: "User created"}})
+			ctx.JSON(http.StatusCreated, interfaces.Response{Data: interfaces.Message{Message: "User created"}})
 		}
 	}
 }

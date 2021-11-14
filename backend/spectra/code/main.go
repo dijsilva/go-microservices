@@ -5,6 +5,7 @@ import (
 	"spectra/commom"
 	"spectra/database"
 	appErrors "spectra/errors"
+	"spectra/middleware"
 	"spectra/routes"
 
 	"github.com/gin-gonic/gin"
@@ -36,7 +37,7 @@ func main() {
 
 	main.App = gin.Default()
 	main.App.MaxMultipartMemory = 15 << 20 // max 15 MiB
-
+	main.App.Use(middleware.CORSMiddleware())
 	v1 := main.App.Group("/api/v1/")
 	{
 		spectraRoutes := routes.Routes{}

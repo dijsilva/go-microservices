@@ -14,10 +14,10 @@ services:
     volumes:
       - ./mongo-scripts/init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
-  # spectra:
-  #   build: .
-  #   container_name: "spectra_api"
-  #   ports:
-  #       - "3003:80"
-  #   depends_on:
-  #       - mongo_espectra
+  spectra:
+    build: .
+    container_name: "spectra_api"
+    ports:
+        - "3004:80"
+    depends_on:
+        - mongo_espectra

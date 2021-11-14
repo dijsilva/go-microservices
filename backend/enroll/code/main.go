@@ -2,6 +2,7 @@ package main
 
 import (
 	"enroll/database"
+	"enroll/middleware"
 	"enroll/routes"
 	"enroll/utils"
 
@@ -37,6 +38,7 @@ func main() {
 		return
 	}
 
+	mainModule.appRouting.Use(middleware.CORSMiddleware())
 	v1 := mainModule.appRouting.Group("/api/v1")
 	{
 		userGroup := v1.Group("/users")
