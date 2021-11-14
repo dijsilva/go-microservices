@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"spectra/commom"
 	"spectra/database"
 	appErrors "spectra/errors"
 	"spectra/middleware"
+	"spectra/rabbitmq"
 	"spectra/routes"
 
 	"github.com/gin-gonic/gin"
@@ -30,10 +32,21 @@ func main() {
 	main := Main{}
 	err := initConfigServer()
 	defer database.Database.DisconnectDatabse()
-
 	if err.Message != "" {
+		log.Fatal(err.Message)
 		return
 	}
+
+	rabbitMQConnection, rabbitMQChanel, rabbitError := rabbitmq.CreateConnection()
+
+	if rabbitError.Message != "" {
+		log.Fatal(rabbitError.Message)
+		return
+	}
+	defer rabbitMQConnection.Close()
+	defer rabbitMQChanel.Close()
+
+	rabbitmq.RabbitMQChannel = rabbitMQChanel
 
 	main.App = gin.Default()
 	main.App.MaxMultipartMemory = 15 << 20 // max 15 MiB

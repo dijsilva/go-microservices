@@ -5,9 +5,13 @@ import (
 	"fmt"
 	"log"
 	"mime/multipart"
+	"spectra/commom"
 	"spectra/database"
 	appErrors "spectra/errors"
+	"spectra/rabbitmq"
 	"strconv"
+
+	"github.com/streadway/amqp"
 )
 
 type SpectraServices struct{}
@@ -96,6 +100,15 @@ func (s *SpectraServices) CreateSpectraService(input CreateSpectraInput, file *m
 	hexId, errStore := database.Database.Create(createSpectraDTO)
 	if errStore.Message != "" {
 		return hexId, errStore
+	}
+
+	var message = amqp.Publishing{
+		ContentType: "text/plain",
+		Body:        []byte(hexId),
+	}
+	errorRabbitMQ := rabbitmq.SendMessage(rabbitmq.RabbitMQChannel, message, commom.Envs.RabbitMQQueue)
+	if errorRabbitMQ.Message != "" {
+		return "", errorRabbitMQ
 	}
 	return hexId, serviceError
 }
