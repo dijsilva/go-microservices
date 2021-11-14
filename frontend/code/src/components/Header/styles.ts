@@ -10,9 +10,11 @@ export const HeaderContainer = styled.div`
   justify-content: space-between;
   padding: 0px 30px;
 
-  > svg {
+  svg {
     cursor: pointer;
+    margin-left: 10px;
   }
+
   p {
     color: white;
     font-size: 20px;

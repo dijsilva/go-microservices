@@ -1,7 +1,16 @@
 import React, { useState } from "react";
 
 import { Header } from '../../components/Header';
-import { Container, Form, TextInput, LabelInput, DropZoneArea, DropZoneContainer } from './styles';
+import {
+  Container,
+  Form,
+  TextInput,
+  LabelInput,
+  DropZoneArea,
+  DropZoneContainer
+} from './styles';
+
+import { useNavigate } from 'react-router-dom';
 
 import { useDropzone } from 'react-dropzone'
 import { GiConfirmed } from 'react-icons/gi';
@@ -11,6 +20,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 export const NewSpectra = (): JSX.Element => {
+  const navigate = useNavigate()
   const [waitingToSend, setWaitingToSend] = useState(true);
   const [spectraFile, setSpectraFile] = useState<File>()
   const [spectraFilename, setSpectraFileName] = useState<string>('')
@@ -89,7 +99,12 @@ export const NewSpectra = (): JSX.Element => {
           'Content-Type': 'multipart/form-data'
         }
       })
-      console.log({ response })
+      if (response && response.status && response.status === 201) {
+        toast.success('Espectro enviado!')
+        setTimeout(() => {
+          navigate('/home')
+        }, 3000)
+      }
     } catch (err) {
       if (axios.isAxiosError(err)) {
         console.log(err.response?.data)

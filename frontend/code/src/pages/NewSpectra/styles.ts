@@ -59,6 +59,7 @@ export const DropZoneContainer = styled.div`
   width: 45%;
   height: 100%;
   display: flex;
+  cursor: pointer;
   padding-top: 25px;
   /* align-items: center; */
   justify-content: center;

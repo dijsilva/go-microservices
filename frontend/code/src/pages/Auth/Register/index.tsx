@@ -43,30 +43,30 @@ export const RegisterForm = ({ backToHomeScreen }: RegisterFormProps): JSX.Eleme
       if (axios.isAxiosError(err)) {
         if (err.response?.data?.data?.message === 'User already exists') {
           toast.error("Usuário já cadastrado")
-          setInterval(() => {
+          setTimeout(() => {
             backToHomeScreen()
           }, 3000)
         } else {
           toast.error("Erro no servidor")
-          setInterval(() => {
+          setTimeout(() => {
             backToHomeScreen()
           }, 3000)
         }
       } else {
         toast.error("Erro inesperado")
-        setInterval(() => {
+        setTimeout(() => {
           backToHomeScreen()
         }, 3000)
       }
     }
     if (response && response.status === 201) {
       toast.success("Usuário criado com sucesso!")
-      setInterval(() => {
+      setTimeout(() => {
         backToHomeScreen()
       }, 3000)
     } else if (response?.status === 400 && response.data.message === 'User alreay exists') {
       toast.error("Usuário já cadastro com esses dados")
-      setInterval(() => {
+      setTimeout(() => {
         backToHomeScreen()
       }, 3000)
     }

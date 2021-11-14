@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { HeaderContainer } from "./styles";
 import { FiLogOut } from 'react-icons/fi';
+import { HiHome } from 'react-icons/hi';
 
 export const Header = (): JSX.Element => {
   const navigate = useNavigate()
@@ -28,7 +29,10 @@ export const Header = (): JSX.Element => {
   return (
     <HeaderContainer>
         <p>Olá, <strong>{userData.name}</strong></p>
-        <FiLogOut onClick={() => logout()} size={28} title="Sair" color="white" />
+        <div>
+          <HiHome onClick={() => navigate('/home')} size={28} title="Sair" color="white" />
+          <FiLogOut onClick={() => logout()} size={28} title="Sair" color="white" />
+        </div>
     </HeaderContainer>
   );
 };
