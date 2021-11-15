@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  spectra_prediction:
+      build: .
+      restart: always
+      container_name: "spectra_prediction"
+      env_file:
+          - ./code/.env
+      ports:
+          - "5000:80"
+      volumes:
+          - ./code/app:/app

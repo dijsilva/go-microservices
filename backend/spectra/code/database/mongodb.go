@@ -25,12 +25,19 @@ type SpectraFileRow struct {
 	Values   []SpectraAbsorbanceColumn `bson:"values"`
 }
 
+type PredictionInfo struct {
+	PredictionDate   string `bson:"prediction_date"`
+	PredictionString string `bson:"prediction_string"`
+	PredictionNumber int    `bson:"prediction_numer"`
+}
+
 type SpectraDTO struct {
 	ID                  primitive.ObjectID `bson:"_id" json:"id"`
 	SampleName          string             `bson:"sample_name" binding:"required"`
 	EmailOwner          string             `bson:"email_owner"`
 	NSpectra            int                `bson:"n_spectra" binding:"required"`
 	EquipmentUsed       string             `bson:"equipment_used" binding:"required"`
+	PredictionInfo      PredictionInfo     `bson:"prediction_info" binding:"required"`
 	PredictionConcluded bool               `bson:"prediction_concluded" default:"false"`
 	Rows                []SpectraFileRow   `bson:"data"`
 	CreatedAt           primitive.DateTime `bson:"createdAt"`
@@ -98,6 +105,27 @@ func (m *MongoDb) Create(input SpectraDTO) (string, appErrors.ErrorResponse) {
 	}
 	hexId := dataInserted.InsertedID.(primitive.ObjectID).Hex() // @TODO: estudar mais
 	return hexId, appErrors.ErrorResponse{}
+}
+
+func (m *MongoDb) UpdatePredictionInfo(id string, input PredictionInfo) (string, appErrors.ErrorResponse) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	log.Println("Getting spectra_request collection")
+	collection := m.Client.Database(commom.Envs.MongoDbDatabaseName).Collection("spectra_request")
+	objectId, errParseId := primitive.ObjectIDFromHex(id)
+	if errParseId != nil {
+		return "", appErrors.BadRequest("invalid id")
+	}
+	filter := bson.M{"_id": objectId}
+	update := bson.D{
+		{"$set", bson.M{"prediction_info": input}},
+	}
+	opt := options.Update().SetUpsert(true)
+	_, err := collection.UpdateOne(ctx, filter, update, opt)
+	if err != nil {
+		return "", appErrors.InternalServerError(fmt.Sprintf("Error to store data - %s", err.Error()))
+	}
+	return id, appErrors.ErrorResponse{}
 }
 
 func (m *MongoDb) ListByOwner(emailOwner string) ([]SpectrasResponse, appErrors.ErrorResponse) {

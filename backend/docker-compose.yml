@@ -65,3 +65,14 @@ services:
         - "3004:80"
     depends_on:
         - mongo_espectra
+
+  spectra_prediction:
+      build: ./spectra-prediction/.
+      restart: always
+      container_name: "spectra_prediction"
+      env_file:
+          - ./spectra-prediction/code/.env
+      ports:
+          - "5000:80"
+      volumes:
+          - ./spectra-prediction/code/app:/app

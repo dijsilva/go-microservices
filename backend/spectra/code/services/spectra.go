@@ -23,6 +23,12 @@ type CreateSpectraInput struct {
 	EmailOwner    string
 }
 
+type UpdatePredictionSpectra struct {
+	PredictionDate   string `json:"prediction_date" binding:"required"`
+	PredictionString string `json:"prediction_string" binding:"required"`
+	PredictionNumber int    `json:"prediction_number" binding:"required"`
+}
+
 func (s *SpectraServices) CreateSpectraService(input CreateSpectraInput, file *multipart.FileHeader) (string, appErrors.ErrorResponse) {
 	var serviceError appErrors.ErrorResponse
 	fileOpen, err := file.Open()
@@ -111,6 +117,23 @@ func (s *SpectraServices) CreateSpectraService(input CreateSpectraInput, file *m
 		return "", errorRabbitMQ
 	}
 	return hexId, serviceError
+}
+
+func (s *SpectraServices) UpdatePrediction(id string, input UpdatePredictionSpectra) (string, appErrors.ErrorResponse) {
+	var serviceError appErrors.ErrorResponse
+	log.Println("Parse input to prediction info dto")
+	updateInfo := database.PredictionInfo{
+		PredictionDate:   input.PredictionDate,
+		PredictionString: input.PredictionString,
+		PredictionNumber: input.PredictionNumber,
+	}
+
+	log.Println("Sending data to repository")
+	recordId, errUpdate := database.Database.UpdatePredictionInfo(id, updateInfo)
+	if errUpdate.Message != "" {
+		return "", errUpdate
+	}
+	return recordId, serviceError
 }
 
 func (s *SpectraServices) ListByOwner(usernameOwner string) ([]database.SpectrasResponse, appErrors.ErrorResponse) {

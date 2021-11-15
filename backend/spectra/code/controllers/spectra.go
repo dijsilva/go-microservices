@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 	"spectra/interfaces"
 	"spectra/services"
@@ -96,4 +97,36 @@ func (s *SpectraController) GetById(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, record)
+}
+
+func (s *SpectraController) UpdatePrediction(ctx *gin.Context) {
+	spectraServices := services.SpectraServices{}
+	input := services.UpdatePredictionSpectra{}
+	id := ctx.Param("id")
+	if id == "" {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, interfaces.ErrorResponse{
+			Data:   "Id not provided",
+			Status: http.StatusBadRequest,
+		})
+		return
+	}
+
+	if err := ctx.ShouldBind(&input); err != nil {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	log.Println("Sending data for service")
+	record, errorUpdatePrediction := spectraServices.UpdatePrediction(id, input)
+
+	if errorUpdatePrediction.Message != "" {
+		log.Println(errorUpdatePrediction.Message)
+		ctx.JSON(errorUpdatePrediction.StatusCode(), interfaces.ErrorResponse{
+			Data:   errorUpdatePrediction.Error(),
+			Status: errorUpdatePrediction.StatusCode(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusCreated, record)
 }
