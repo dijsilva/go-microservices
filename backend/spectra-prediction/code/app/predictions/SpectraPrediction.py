@@ -1,4 +1,7 @@
+import pickle
 import pandas as pd
+import os
+from scipy.signal import savgol_filter
 
 class SpectraPrediction:
     def pre_processing_samples(self, rows):
@@ -26,4 +29,26 @@ class SpectraPrediction:
 
         matrix = self.pre_processing_samples(rows)
 
-        print(matrix)
+        if matrix.shape[0] >= 2:
+            matrix = matrix.mean(axis=0)
+        
+        print('Loading model')
+
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        with open(f"{dir_path}/model/randomforest_1.0.pkl", 'rb') as m:
+            model = pickle.load(m)
+
+        x = savgol_filter(matrix.values, polyorder=4, deriv=2, window_length=11)
+
+        predictions = model.predict(x)
+        predicao = self.getStringClassified(predictions[0])
+        return predicao, predictions[0]
+
+    def getStringClassified(self, prediction: int) -> str:
+        classes = {
+            1: 'Saudável',
+            2: 'Câncer no endométrio',
+            3: 'Câncer de ovário'
+        }
+
+        return classes[prediction]

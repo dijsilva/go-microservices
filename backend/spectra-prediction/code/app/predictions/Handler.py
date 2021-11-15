@@ -1,19 +1,29 @@
 from app.predictions.SpectraPrediction import SpectraPrediction
 from app.services.SpectraMicroservice import SpectraMicroservice
 from app.configuration.envs import ApplicationEnvs
+from datetime import datetime
 
 class MessageHandler:
     def __init__(self) -> None:
         self.model = SpectraPrediction()
-        self.spectraService = SpectraMicroservice(
+        self.spectra_service = SpectraMicroservice(
             ApplicationEnvs.SPECTRA_MICROSERVICE_HOST,
-            f"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRpZWdvanNpbHZhYnJAZ21haWwuY29tIiwiZXhwIjoxNjM2OTMxNDMyLCJpZCI6IjBlZjg2ZDZjLTYxMTgtNDc3Mi1iNzNiLTY4OGZmODJjOTJjOSIsIm5hbWUiOiJEaWVnbyIsInByb2ZpbGUiOiJVU0VSIiwidG9rZW5LaW5kIjoiTE9HSU5fVVNFUiJ9.04JgVxDPcffWUDGFJWAWkoizlhk_cjhCu9ATknOzlQU"
         )
     
     def pass_message(self, message: str) -> None:
         self.spectra_id = message
 
-        spectraData = self.spectraService.getSpectraData(message)
+        spectraData = self.spectra_service.get_spectra_data(message)
 
-        self.model.predict(spectraData)
+        prediction, prediction_number = self.model.predict(spectraData)
+
+        prediction_data = {
+            'prediction_date': datetime.isoformat(datetime.now()),
+            'prediction_string': prediction,
+            'prediction_number': int(prediction_number),
+        }
+
+        print(f'sending prediction {prediction_data}')
+
+        self.spectra_service.inform_prediction(self.spectra_id, data=prediction_data)
         

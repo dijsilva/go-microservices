@@ -1,17 +1,15 @@
-FROM python:3.9.8-alpine3.14
-
+FROM python:3.8-slim
 RUN \
-  apk update && \
-  apk add bash py-pip && \
+  apt-get update && \
+  apt-get install build-essential -y && \
   pip --no-cache-dir install -U pip
 
-RUN apk add --update \
-  python3-dev \
-  build-base \
-  linux-headers
+RUN apt-get install \
+  supervisor \
+  python3-dev -y
 
 COPY ./code/requirements.txt /requirements.txt
-RUN pip3 install -r requirements.txt
+RUN python3 -m pip install -r requirements.txt
 
 EXPOSE 80
 WORKDIR /app

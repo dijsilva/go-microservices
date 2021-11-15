@@ -12,9 +12,9 @@ type Routes struct{}
 func (r *Routes) Handler(routerGroup *gin.RouterGroup) {
 	spectraController := controllers.SpectraController{}
 
-	routerGroup.Use(middleware.Authentication())
-	routerGroup.POST("/create", spectraController.CreateSpectra)
-	routerGroup.GET("/list-by-owner", spectraController.ListByOwner)
+	routerGroup.POST("/prediction/:id", spectraController.UpdatePrediction)
+	routerGroup.POST("/create", middleware.Authentication(), spectraController.CreateSpectra)
+	routerGroup.GET("/list-by-owner", middleware.Authentication(), spectraController.ListByOwner)
 	routerGroup.GET("/spectra/:id", spectraController.GetById)
 
 }
