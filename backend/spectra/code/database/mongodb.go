@@ -26,9 +26,9 @@ type SpectraFileRow struct {
 }
 
 type PredictionInfo struct {
-	PredictionDate   string `bson:"prediction_date"`
-	PredictionString string `bson:"prediction_string"`
-	PredictionNumber int    `bson:"prediction_numer"`
+	PredictionDate   string `bson:"prediction_date" json:"prediction_date"`
+	PredictionString string `bson:"prediction_string" json:"prediction_string"`
+	PredictionNumber int    `bson:"prediction_number" json:"prediction_number"`
 }
 
 type SpectraDTO struct {
@@ -50,6 +50,7 @@ type SpectrasResponse struct {
 	EmailOwner          string             `bson:"email_owner" json:"email_owner"`
 	NSpectra            int                `bson:"n_spectra" json:"n_spectra"`
 	EquipmentUsed       string             `bson:"equipment_used" json:"equipament_used"`
+	PredictionInfo      PredictionInfo     `bson:"prediction_info" json:"prediction_info"`
 	PredictionConcluded bool               `bson:"prediction_concluded" json:"prediction_concluded"`
 	CreatedAt           primitive.DateTime `bson:"createdAt" json:"created_at"`
 	UpdatedAt           primitive.DateTime `bson:"updatedAt" json:"updated_at"`
@@ -119,6 +120,7 @@ func (m *MongoDb) UpdatePredictionInfo(id string, input PredictionInfo) (string,
 	filter := bson.M{"_id": objectId}
 	update := bson.D{
 		{"$set", bson.M{"prediction_info": input}},
+		{"$set", bson.M{"prediction_concluded": true}},
 	}
 	opt := options.Update().SetUpsert(true)
 	_, err := collection.UpdateOne(ctx, filter, update, opt)

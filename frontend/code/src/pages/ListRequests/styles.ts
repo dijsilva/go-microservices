@@ -30,7 +30,19 @@ export const RequestContainer = styled.div`
     font-weight: 400;
   }
 
+  h3#result {
+    margin-top: 10px;
+  }
+
   span {
     text-transform: uppercase;
   }
 `;
+
+interface IStatusText {
+  concluded: boolean;
+}
+
+export const StatusText = styled.strong<IStatusText>`
+  color: ${(props) => props.concluded ? '#71e84d' : '#548AFF'}
+`
