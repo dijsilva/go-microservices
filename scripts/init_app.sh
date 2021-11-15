@@ -8,3 +8,6 @@ docker-compose up -d --build rabbitmq
 echo "Building microservices"
 docker-compose up -d --build enroll && docker-compose up -d --build auth_control && \
     docker-compose up -d --build spectra && docker-compose up -d --build spectra_prediction
+
+echo "Building frontend"
+docker-compose up -d --build spectra_frontend

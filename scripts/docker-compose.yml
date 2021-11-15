@@ -19,7 +19,7 @@ services:
     ports:
         - "6379:6379"
   auth_control:
-    build: ./auth-control/.
+    build: ../backend/auth-control/.
     container_name: "auth_control_api"
     ports:
         - "3002:80"
@@ -38,7 +38,7 @@ services:
         - "5432:5432"
 
   enroll:
-    build: ./enroll/.
+    build: ../backend/enroll/.
     container_name: "enroll"
     ports:
         - "3003:80"
@@ -56,10 +56,10 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - ./spectra/mongo-scripts/init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ../backend/spectra/mongo-scripts/init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
   spectra:
-    build: ./spectra/.
+    build: ../backend/spectra/.
     container_name: "spectra_api"
     ports:
         - "3004:80"
@@ -67,12 +67,18 @@ services:
         - mongo_espectra
 
   spectra_prediction:
-      build: ./spectra-prediction/.
+      build: ../backend/spectra-prediction/.
       restart: always
       container_name: "spectra_prediction"
       env_file:
-          - ./spectra-prediction/code/.env
+          - ../backend/spectra-prediction/code/.env
       ports:
           - "5000:80"
       volumes:
-          - ./spectra-prediction/code/app:/app
+          - ../backend/spectra-prediction/code/app:/app
+
+  spectra_frontend:
+    container_name: spectra_frontend
+    build: ../frontend/.
+    ports:
+      - '3000:80'

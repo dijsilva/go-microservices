@@ -31,6 +31,7 @@
   "scripts": {
     "start": "react-scripts start",
     "start:local": "env-cmd -f .env.local react-scripts start",
+    "build:local": "GENERATE_SOURCEMAP=false env-cmd -f .env.local react-scripts build",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
