@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { Header } from "../../components/Header";
 
-import { ListRequestsContainer, RequestContainer } from './styles';
+import { ListRequestsContainer, RequestContainer, StatusText } from './styles';
 
 import spectraService from '../../services/spectra';
 import axios from "axios";
@@ -17,6 +17,11 @@ interface RequestsList {
   prediction_concluded: boolean;
   created_at: Date;
   updated_at: Date;
+  prediction_info: {
+    prediction_date: Date;
+    prediction_string: string;
+    prediction_number: number;
+  }
 }
 
 export const ListRequests = (): JSX.Element => {
@@ -97,8 +102,11 @@ export const ListRequests = (): JSX.Element => {
             <h4><strong>Equipamento:</strong> {request.equipament_used}</h4>
             <h4><strong>Enviado em:</strong> {formatData(request.created_at)}</h4>
             <h4><strong>Hora de envio:</strong> {formatHour(request.created_at)}</h4>
+            {request.prediction_info?.prediction_string && (
+              <h3 id="result"><strong>Resultado:</strong> {request.prediction_info.prediction_string}</h3>
+            )}
           </div>
-          <span>Status: <strong>{getStatus(request.prediction_concluded)}</strong></span>
+          <span>Status: <StatusText concluded={request.prediction_concluded}>{getStatus(request.prediction_concluded)}</StatusText></span>
         </RequestContainer>
         ))}
         
